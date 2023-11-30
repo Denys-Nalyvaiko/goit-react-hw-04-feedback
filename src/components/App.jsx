@@ -11,30 +11,19 @@ export const App = () => {
   const [bad, setBad] = useState(0);
 
   const options = { good, neutral, bad };
+  const optionSelections = {
+    good: setGood,
+    neutral: setNeutral,
+    bad: setBad,
+  };
   const countTotalFeedback = () => good + neutral + bad;
 
   const countPositiveFeedbackPercentage = () => {
     return Math.round((good * 100) / countTotalFeedback()) || 0;
   };
 
-  const onLeaveFeedback = currentValue => {
-    switch (currentValue) {
-      case 'good':
-        setGood(prevOption => prevOption + 1);
-        return;
-
-      case 'neutral':
-        setNeutral(prevOption => prevOption + 1);
-        return;
-
-      case 'bad':
-        setBad(prevOption => prevOption + 1);
-        return;
-
-      default:
-        throw new Error(`Option ${currentValue} is not exist!`);
-    }
-  };
+  const onLeaveFeedback = currentValue =>
+    optionSelections[currentValue](prevOption => prevOption + 1);
 
   return (
     <>
