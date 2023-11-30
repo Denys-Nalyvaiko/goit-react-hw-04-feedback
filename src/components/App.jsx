@@ -1,52 +1,54 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { Global } from '@emotion/react';
 import { Section } from './Section/Section';
 import { GlobalStyles } from 'css/GlobalStyles';
 import { FeedbackOptions } from 'components/FeedbackOptions/FeedbackOptions';
 import { Statistic } from 'components/Statistic/Statistic';
 
-export class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
+export const App = () => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+
+  const options = { good, neutral, bad };
+  const countTotalFeedback = () => good + neutral + bad;
+
+  const countPositiveFeedbackPercentage = () => {
+    return Math.round((good * 100) / countTotalFeedback()) || 0;
   };
 
-  countTotalFeedback() {
-    const { good, neutral, bad } = this.state;
-    return good + neutral + bad;
-  }
+  const onLeaveFeedback = currentValue => {
+    switch (currentValue) {
+      case 'good':
+        setGood(prevOption => prevOption + 1);
+        return;
 
-  countPositiveFeedbackPercentage() {
-    return Math.round((this.state.good * 100) / this.countTotalFeedback()) || 0;
-  }
+      case 'neutral':
+        setNeutral(prevOption => prevOption + 1);
+        return;
 
-  onLeaveFeedback = currentValue => {
-    this.setState(prevState => ({
-      [currentValue]: prevState[currentValue] + 1,
-    }));
+      case 'bad':
+        setBad(prevOption => prevOption + 1);
+        return;
+
+      default:
+        throw new Error(`Option ${currentValue} is not exist!`);
+    }
   };
 
-  render() {
-    const { good, neutral, bad } = this.state;
-
-    return (
-      <>
-        <Global styles={GlobalStyles} />
-        <Section title="Please leave feedback">
-          <FeedbackOptions
-            options={this.state}
-            onLeaveFeedback={this.onLeaveFeedback}
-          />
-          <Statistic
-            good={good}
-            neutral={neutral}
-            bad={bad}
-            total={this.countTotalFeedback()}
-            positivePercentage={this.countPositiveFeedbackPercentage()}
-          />
-        </Section>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Global styles={GlobalStyles} />
+      <Section title="Please leave feedback">
+        <FeedbackOptions options={options} onLeaveFeedback={onLeaveFeedback} />
+        <Statistic
+          good={good}
+          neutral={neutral}
+          bad={bad}
+          total={countTotalFeedback()}
+          positivePercentage={countPositiveFeedbackPercentage()}
+        />
+      </Section>
+    </>
+  );
+};
